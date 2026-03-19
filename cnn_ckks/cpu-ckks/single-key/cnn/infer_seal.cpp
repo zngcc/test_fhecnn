@@ -253,9 +253,9 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	// approximation boundary setting
 
 ////////////////////////////////////////////////////////////////////////
-	// double B = 40.0;	// approximation boundary
+	double B = 40.0;	// approximation boundary
 
-	double B = 50.0;	// approximation boundary
+	// double B = 50.0;	// approximation boundary
 ////////////////////////////////////////////////////////////////////////
 
 	// approx ReLU setting
@@ -291,11 +291,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	// SEAL and bootstrapping setting
 //////////////////////////////////////////////////
-	// long boundary_K = 25;
-	// long boot_deg = 59;
+	long boundary_K = 25;
+	long boot_deg = 59;
 
-	long boundary_K = 20;  
-	long boot_deg = 59; 
+	// long boundary_K = 20;  
+	// long boot_deg = 59; 
   
 //////////////////////////////////////////////////
 
@@ -312,16 +312,16 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int log_special_prime = 51;
     int log_integer_part = logq - logp - loge + 5;
 ////////////////////////////////////////////////////////////////////
-	// int remaining_level = 16; // Calculation required
-	// int boot_level = 14; // 
+	int remaining_level = 16; // Calculation required
+	int boot_level = 14; // 
 
-	int remaining_level = 0;
-	for (int i = 0; i < comp_no; i++) {
-		remaining_level += ceil(log2(deg[i]));
-	}
-	remaining_level += 1; // for ReLU function
+	// int remaining_level = 0;
+	// for (int i = 0; i < comp_no; i++) {
+	// 	remaining_level += ceil(log2(deg[i]));
+	// }
+	// remaining_level += 1; // for ReLU function
 	
-	int boot_level = 14; // bootstrap level (保持与原始配置相同)
+	// int boot_level = 14; // bootstrap level (保持与原始配置相同)
 
 
 ////////////////////////////////////////////////////////////////////
@@ -397,11 +397,16 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	{
 		if(find(gal_steps_vector.begin(), gal_steps_vector.end(), rot) == gal_steps_vector.end()) gal_steps_vector.push_back(rot);
 	} 
+	cout << "Adding Bootstrapping Keys...111" << endl;
 	bootstrapper_1.addLeftRotKeys_Linear_to_vector_3(gal_steps_vector);
+		cout << "Adding Bootstrapping Keys...222" << endl;
 	bootstrapper_2.addLeftRotKeys_Linear_to_vector_3(gal_steps_vector);
+			cout << "Adding Bootstrapping Keys...333" << endl;
 	bootstrapper_3.addLeftRotKeys_Linear_to_vector_3(gal_steps_vector);
+	cout << "create_galois_keys...333" << endl;
 	keygen.create_galois_keys(gal_steps_vector, gal_keys);
 
+				cout << "push_back...111" << endl;
 	bootstrapper_1.slot_vec.push_back(logn_1);
 	bootstrapper_2.slot_vec.push_back(logn_2);
 	bootstrapper_3.slot_vec.push_back(logn_3);
@@ -424,7 +429,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 56) end_num = 8;	// 0 ~ 8
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
-
+	cout << "begin parallel ..." << endl;
 	#pragma omp parallel for num_threads(50)
 	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	{

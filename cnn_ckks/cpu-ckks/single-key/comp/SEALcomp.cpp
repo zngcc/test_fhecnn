@@ -10,7 +10,7 @@ void minimax_ReLU_seal(long comp_no, vector<int> deg, long alpha, vector<Tree> &
 
 	// ifstream and scale
 	string str;
-	string addr = "../result";
+	string addr = "../approx_para";
 	str = addr + "/d" + to_string(alpha) + ".txt";
 	ifstream in(str);
 

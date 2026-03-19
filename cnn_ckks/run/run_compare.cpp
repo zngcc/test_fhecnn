@@ -83,11 +83,13 @@ int main() {
 	encryptor.encrypt(plain_x, cipher_x);
 
 	// MinimaxReLU
-	cout << endl << "MinimaxReLU" << endl;
+	cout << endl << "Decrypt" << endl;
 	// print_cipher(decryptor, encoder, public_key, secret_key, relin_keys, cipher_x);
 	decrypt_and_print_part(cipher_x, decryptor, encoder, n, 0, 5);
 	time_start = chrono::high_resolution_clock::now();
+		cout << endl << "MinimaxReLU" << endl;
 	minimax_ReLU_seal(comp_no, deg, alpha, tree, scaled_val, scalingfactor, encryptor, evaluator, decryptor, encoder, public_key, secret_key, relin_keys, cipher_x, cipher_x);
+			cout << endl << "MinimaxReLU end" << endl;
 	time_end = chrono::high_resolution_clock::now();
 	time_diff = chrono::duration_cast<chrono::milliseconds>(time_end - time_start);
 

@@ -11,8 +11,8 @@ echo "use env: $CONDA_PREFIX"
 ########
 export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
 cd cnn_ckks
-make clean
-rm -rf build
+# make clean
+# rm -rf build
 cmake -S . -B build \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
@@ -21,12 +21,12 @@ cmake -S . -B build \
     -DNTL_INCLUDE_DIR=$CONDA_PREFIX/include \
     -DNTL_LIBRARY=$CONDA_PREFIX/lib/libntl.so \
     -DCMAKE_CXX_COMPILER=g++ \
-    -DCOMP=ON \
+    -DCOMP=OFF \
     -DBOOT=OFF \
-    -DCNN=OFF
+    -DCNN=ON
 
 cd build
 make -j 4
-./compare
+# ./compare
 # ./bootstrapping
-# ./cnn 20 10 6 9
+./cnn 20 10 6 9

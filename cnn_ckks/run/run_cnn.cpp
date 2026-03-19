@@ -3,9 +3,28 @@
 #include "infer_seal.h"
 #include <algorithm>
 
+
+#include <unistd.h>
+#include <climits> // For PAGESIZE
 using namespace std;
 
+
+void printSysconfMemoryInfo() {
+    long pagesize = sysconf(_SC_PAGESIZE);
+    long page_count = sysconf(_SC_PHYS_PAGES);
+    long avail_page_count = sysconf(_SC_AVPHYS_PAGES);
+
+    if (pagesize == -1 || page_count == -1 || avail_page_count == -1) {
+        std::cerr << "无法获取内存信息\n";
+        return;
+    }
+
+    std::cout << "页面大小: " << pagesize << " bytes\n";
+    std::cout << "总物理内存: " << (page_count * pagesize) / (1024 * 1024) << " MB\n";
+    std::cout << "可用物理内存: " << (avail_page_count * pagesize) / (1024 * 1024) << " MB\n";
+}
 int main(int argc, char **argv) {
+	printSysconfMemoryInfo();
 	int layer = atoi(argv[1]);
 	int dataset = atoi(argv[2]);
 	int start = atoi(argv[3]);

@@ -4,11 +4,11 @@ void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &li
 {
 	string dir;
 	if(layer_num!=20 && layer_num!=32 && layer_num!=44 && layer_num!=56 && layer_num!=110) throw std::invalid_argument("layer number is not valid");
-	if(layer_num == 20) dir = "resnet20_new";
-	else if(layer_num == 32) dir = "resnet32_new";
-	else if(layer_num == 44) dir = "resnet44_new";
-	else if(layer_num == 56) dir = "resnet56_new";
-	else if(layer_num == 110) dir = "resnet110_new";
+	if(layer_num == 20) dir = "mpcnn_models/resnet20_new";
+	else if(layer_num == 32) dir = "mpcnn_models/resnet32_new";
+	else if(layer_num == 44) dir = "mpcnn_models/resnet44_new";
+	else if(layer_num == 56) dir = "mpcnn_models/resnet56_new";
+	else if(layer_num == 110) dir = "mpcnn_models/resnet110_new";
 
 	ifstream in;
 	double val;
@@ -430,18 +430,19 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
 	cout << "begin parallel ..." << endl;
-	#pragma omp parallel for num_threads(50)
+	#pragma omp parallel for num_threads(16)
 	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	{
 		// each thread output result file
 		ofstream output;
+		cout << "create output file" << endl;
 		if(layer_num == 20) output.open("../../result/resnet20_cifar10_image" + to_string(image_id) + ".txt");
 		else if(layer_num == 32) output.open("../../result/resnet32_cifar10_image" + to_string(image_id) + ".txt");
 		else if(layer_num == 44) output.open("../../result/resnet44_cifar10_image" + to_string(image_id) + ".txt");
 		else if(layer_num == 56) output.open("../../result/resnet56_cifar10_image" + to_string(image_id) + ".txt");
 		else if(layer_num == 110) output.open("../../result/resnet110_cifar10_image" + to_string(image_id) + ".txt");
 		else throw std::invalid_argument("layer_num is not correct");
-		string dir = "resnet" + to_string(layer_num) + "_new";
+		string dir = "mpcnn_models/resnet" + to_string(layer_num) + "_new";
 
 		// ciphertext pool generation
 		vector<Ciphertext> cipher_pool(14);
@@ -460,11 +461,13 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		double epsilon = 0.00001;
 		vector<double> image, linear_weight, linear_bias;
 		vector<vector<double>> conv_weight, bn_bias, bn_running_mean, bn_running_var, bn_weight;
+				cout << "import par" << endl;
 		import_parameters_cifar10(linear_weight, linear_bias, conv_weight, bn_bias, bn_running_mean, bn_running_var, bn_weight, layer_num, end_num);
-
+				cout << "import par over" << endl;
 		// pack images compactly
 		ifstream in;
 		double val;
+		cout << "open test_values" << endl;
 		in.open("../../../testFile/test_values.txt");
 		for(long i=0; i<1<<logn; i++) image.emplace_back(0);
 		for(long i=0; i<32*32*3 *image_id; i++) {in>>val;}
@@ -474,6 +477,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 		ifstream in_label;
 		int image_label;
+		cout << "open test_label" << endl;
 		in_label.open("../../../testFile/test_label.txt");
 		for(long i=0; i<image_id; i++) {in_label>>image_label;}
 		in_label >> image_label;

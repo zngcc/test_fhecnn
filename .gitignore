@@ -1,0 +1,5 @@
+datasets/cifar10/*
+datasets/cifar100/*
+testFile_cifar100/*
+testFile/*
+result/*

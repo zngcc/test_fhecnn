@@ -251,7 +251,12 @@ void import_parameters_cifar100(vector<double> &linear_weight, vector<double> &l
 void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t end_image_id)
 {
 	// approximation boundary setting
-	double B = 40.0;	// approximation boundary
+
+////////////////////////////////////////////////////////////////////////
+	// double B = 40.0;	// approximation boundary
+
+	double B = 50.0;	// approximation boundary
+////////////////////////////////////////////////////////////////////////
 
 	// approx ReLU setting
 	long alpha = 13;			// precision parameter alpha
@@ -285,8 +290,15 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else throw std::invalid_argument("layer_num is not correct");
 
 	// SEAL and bootstrapping setting
-	long boundary_K = 25;
-	long boot_deg = 59;
+//////////////////////////////////////////////////
+	// long boundary_K = 25;
+	// long boot_deg = 59;
+
+	long boundary_K = 20;  
+	long boot_deg = 59; 
+  
+//////////////////////////////////////////////////
+
     long scale_factor = 2;
     long inverse_deg = 1; 
 	long logN = 16;
@@ -299,8 +311,20 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int logq = 51;
 	int log_special_prime = 51;
     int log_integer_part = logq - logp - loge + 5;
-	int remaining_level = 16; // Calculation required
-	int boot_level = 14; // 
+////////////////////////////////////////////////////////////////////
+	// int remaining_level = 16; // Calculation required
+	// int boot_level = 14; // 
+
+	int remaining_level = 0;
+	for (int i = 0; i < comp_no; i++) {
+		remaining_level += ceil(log2(deg[i]));
+	}
+	remaining_level += 1; // for ReLU function
+	
+	int boot_level = 14; // bootstrap level (保持与原始配置相同)
+
+
+////////////////////////////////////////////////////////////////////
 	int total_level = remaining_level + boot_level;
 
 	vector<int> coeff_bit_vec;
@@ -459,7 +483,13 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		// modulus down
 		Ciphertext ctxt;
 		ctxt = cnn.cipher();
+		////////////////////////////////////////////////////////////////////////
 		for(int i=0; i<boot_level-3; i++) evaluator.mod_switch_to_next_inplace(ctxt);
+		
+		// int mod_switch_count = min(boot_level-3, remaining_level-1);
+		// for(int i=0; i<mod_switch_count; i++) evaluator.mod_switch_to_next_inplace(ctxt);
+		
+		////////////////////////////////////////////////////////////////////////
 		cnn.set_ciphertext(ctxt);
 
 		// layer 0

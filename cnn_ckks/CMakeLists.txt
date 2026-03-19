@@ -21,7 +21,7 @@ if(COMP)
 			${COMMON_SOURCE_FILES}
 			${COMP_SOURCE_FILES}
 	)
-	target_compile_options(compare PRIVATE -Wall -O3 -std=c++11 -pthread -march=native)
+	target_compile_options(compare PRIVATE -Wall -O3 -std=c++17 -pthread -march=native)
 	target_link_libraries(compare PRIVATE ntl gmp m pthread SEAL::seal)
 	target_include_directories(compare PUBLIC /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${COMP_HEADER_DIR})
 endif()

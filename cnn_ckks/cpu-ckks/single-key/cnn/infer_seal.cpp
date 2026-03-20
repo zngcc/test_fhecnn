@@ -316,11 +316,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	// all threads output files
 	ofstream out_share;
-	if(layer_num == 20) out_share.open("../../result/resnet20_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 32) out_share.open("../../result/resnet32_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 44) out_share.open("../../result/resnet44_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 56) out_share.open("../../result/resnet56_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 110) out_share.open("../../result/resnet110_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	if(layer_num == 20) out_share.open("../../result/resnet20_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
+	else if(layer_num == 32) out_share.open("../../result/resnet32_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
+	else if(layer_num == 44) out_share.open("../../result/resnet44_cifar10_label_"  + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
+	else if(layer_num == 56) out_share.open("../../result/resnet56_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
+	else if(layer_num == 110) out_share.open("../../result/resnet110_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
 	else throw std::invalid_argument("layer_num is not correct");
 
 	// SEAL and bootstrapping setting
@@ -461,7 +461,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
 	cout << "begin parallel ..." << endl;
-	#pragma omp parallel for num_threads(16)
+	#pragma omp parallel for num_threads(4)
 	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	{
 		// each thread output result file

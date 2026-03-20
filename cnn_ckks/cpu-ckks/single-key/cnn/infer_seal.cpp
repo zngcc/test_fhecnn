@@ -253,7 +253,7 @@ void import_parameters_cifar100(vector<double> &linear_weight, vector<double> &l
 	for(long i=0; i<100; i++) {in>>val; linear_bias.emplace_back(val);} in.close();
 }
 
-void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t end_image_id, string precison_config, string model_path)
+void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t end_image_id, string precison_config, string model_path, int threads)
 {
 	
 	auto now = chrono::system_clock::now();
@@ -461,7 +461,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
 	cout << "begin parallel ..." << endl;
-	#pragma omp parallel for num_threads(4)
+	#pragma omp parallel for num_threads(threads)
 	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	{
 		// each thread output result file

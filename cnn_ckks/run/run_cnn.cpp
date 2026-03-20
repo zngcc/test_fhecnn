@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	int end = atoi(argv[4]);
 	string precison = (argc >= 6) ? argv[5] : "deg13";
     string model_path = (argc >= 7) ? argv[6] : "../../pretrained_parameters/mpcnn_models/";
-	int threads = (argc >= 8) ? atoi(argv[7]) : 1; 
+	int threads = (argc >= 8) ? atoi(argv[7]) : 8; 
 
 	if (start < 0 || start >= 10000) throw std::invalid_argument("start number is not correct");
 	if (end < 0 || end >= 10000) throw std::invalid_argument("end number is not correct");

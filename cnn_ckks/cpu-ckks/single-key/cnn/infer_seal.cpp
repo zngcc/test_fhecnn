@@ -272,16 +272,16 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	map<string, ReLUConfig> relu_configs = {
 		{"deg13", {13, 3, {15, 15, 27}, 1.7, 16}},
-		{"deg12", {12, 3, {7, 15, 27},    1.7, 16}},
-		{"deg11", {11, 3, {7, 7, 27},    1.7, 16}},
-		{"deg10", {10, 3, {7, 7, 13},    1.7, 16}},
-		{"deg9",  {9,  2, {15, 15},     1.7, 11}},
-		{"deg8",  {8,  2, {7, 15},    1.7, 16}},
+		{"deg12", {12, 3, {7, 15, 27},  1.7, 15}}, //-1
+		{"deg11", {11, 3, {7, 7, 27},   1.7, 14}}, //-2
+		{"deg10", {10, 3, {7, 7, 13},   1.7, 13}}, // -3
+		{"deg9",  {9,  2, {15, 15},     1.7, 11}}, // -5
+		{"deg8",  {8,  2, { 7, 15},     1.7, 10}}, // -6
 		// more options
 		// 
 	};
 	////////////////////////////////////////////////////////////////////////
-	double B = 40.0;	// approximation boundary
+	double B = 50.0;	// approximation boundary
 
 	// double B = 50.0;	// approximation boundary
 	////////////////////////////////////////////////////////////////////////
@@ -354,9 +354,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int log_special_prime = 51;
     int log_integer_part = logq - logp - loge + 5;
 ////////////////////////////////////////////////////////////////////
-	//TODO change back
-	// int remaining_level = it->second.remaining_level;
-	int remaining_level = threads;
+	int remaining_level = it->second.remaining_level;
 	cout << "remaining_level set " << remaining_level <<endl;
 	// int remaining_level = 16; // Calculation required
 
@@ -473,9 +471,9 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
 	cout << "begin parallel ..." << endl;
-	// TODO change back to threads
-	// #pragma omp parallel for num_threads(threads) 
-	#pragma omp parallel for num_threads(8)
+	// change back to threads
+	#pragma omp parallel for num_threads(threads) 
+	// #pragma omp parallel for num_threads(8)
 	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	{
 		// each thread output result file

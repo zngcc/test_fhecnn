@@ -40,4 +40,11 @@ cmake --build build -j4
 cmake --install build
 ```
 
-## Run the following commands to compile and test:
+## Run the following commands to compile and test (./cnn layer_num dataset startnum endnum precison_par ../../pretrained_parameters/model_path threads_num):
+
+```bash
+conda activate mpcnn
+cd cnn_ckks/build
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+./cnn 20 10 0 8 deg13 ../../pretrained_parameters/xxxxxx 8
+```

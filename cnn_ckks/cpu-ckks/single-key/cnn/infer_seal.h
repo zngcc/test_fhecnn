@@ -14,6 +14,7 @@
 #include <chrono>
 #include <iomanip>
 #include <ctime>
+#include <filesystem>
 
 // import parameters
 void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &linear_bias, vector<vector<double>> &conv_weight, vector<vector<double>> &bn_bias, vector<vector<double>> &bn_running_mean, vector<vector<double>> &bn_running_var, vector<vector<double>> &bn_weight, size_t layer_num, size_t end_num, const std::string &model_path = "../../pretrained_parameters/mpcnn_models/");

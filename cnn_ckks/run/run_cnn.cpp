@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
 	cout << "end image: " << end << endl;
 	cout << "precison_par: " << precison << endl;
     cout << "model path: " << model_path << endl;
+	cout << "threads: " << threads << endl;
 
 	if (dataset == 10) ResNet_cifar10_seal_sparse(layer, start, end, precison, model_path, threads);
 	// else if (dataset == 100) ResNet_cifar100_seal_sparse(layer, start, end);

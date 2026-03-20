@@ -108,7 +108,9 @@ void multiplexed_parallel_convolution_print(const TensorCipher &cnn_in, TensorCi
 
 	time_start = chrono::high_resolution_clock::now();
 	// convolution_seal_sparse(cnn_in, cnn_out, hprime, st, kernel, false, data, running_var, constant_weight, epsilon, encoder, encryptor, scale_evaluator, gal_keys, cipher_pool, end);
+		cout << "multiplexed_parallel_convolution_seal begin" <<endl;
 	multiplexed_parallel_convolution_seal(cnn_in, cnn_out, co, st, fh, fw, data, running_var, constant_weight, epsilon, encoder, encryptor, evaluator, gal_keys, cipher_pool, end);
+		cout << "multiplexed_parallel_convolution_seal end" <<endl;
 	time_end = chrono::high_resolution_clock::now();
 	time_diff = chrono::duration_cast<chrono::milliseconds>(time_end - time_start);
 	cout << "time : " << time_diff.count() / 1000 << " ms" << endl;

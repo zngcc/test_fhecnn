@@ -267,11 +267,12 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		int comp_no;
 		vector<int> deg;
 		double scaled_val;
+		int remaining_level; 
 	};
 
 	map<string, ReLUConfig> relu_configs = {
-		{"deg13", {13, 3, {15, 15, 27}, 1.7}},
-		{"deg9",  {9,  2, {15, 15},     1.7}},
+		{"deg13", {13, 3, {15, 15, 27}, 1.7, 16}},
+		{"deg9",  {9,  2, {15, 15},     1.7, 11}},
 		// more options
 		// 
 	};
@@ -297,6 +298,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int comp_no = it->second.comp_no;
 	vector<int> deg = it->second.deg;
 	double scaled_val = it->second.scaled_val;
+
 	
 	////////////////////
 	vector<Tree> tree;		// structure of polynomial evaluation
@@ -316,11 +318,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	// all threads output files
 	ofstream out_share;
-	if(layer_num == 20) out_share.open("../../result/resnet20_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
-	else if(layer_num == 32) out_share.open("../../result/resnet32_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
-	else if(layer_num == 44) out_share.open("../../result/resnet44_cifar10_label_"  + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
-	else if(layer_num == 56) out_share.open("../../result/resnet56_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
-	else if(layer_num == 110) out_share.open("../../result/resnet110_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id)  + "_" + timestamp);
+	if(layer_num == 20) out_share.open("../../result/" + timestamp + "/resnet20_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 32) out_share.open("../../result/" + timestamp + "/resnet32_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 44) out_share.open("../../result/" + timestamp + "/resnet44_cifar10_label_"  + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 56) out_share.open("../../result/" + timestamp + "/resnet56_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 110) out_share.open("../../result/" + timestamp + "/resnet110_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
 	else throw std::invalid_argument("layer_num is not correct");
 
 	// SEAL and bootstrapping setting
@@ -346,13 +348,14 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int log_special_prime = 51;
     int log_integer_part = logq - logp - loge + 5;
 ////////////////////////////////////////////////////////////////////
+	int remaining_level = it->second.remaining_level;
 	// int remaining_level = 16; // Calculation required
 
-	int remaining_level = 0;
-	for (int i = 0; i < comp_no; i++) {
-		remaining_level += ceil(log2(deg[i]));
-	}
-	remaining_level += 1; // for ReLU function
+	// int remaining_level = 0;
+	// for (int i = 0; i < comp_no; i++) {
+	// 	remaining_level += ceil(log2(deg[i]));
+	// }
+	// remaining_level += 3; // for ReLU function
 	
 ////////////////////////////////////////////////////////////////////
 	int boot_level = 14; // bootstrap level (保持与原始配置相同)
@@ -467,11 +470,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		// each thread output result file
 		ofstream output;
 		cout << "create output file" << endl;
-		if(layer_num == 20) output.open("../../result/resnet20_cifar10_image" + to_string(image_id) + "_" + timestamp +  ".txt");
-		else if(layer_num == 32) output.open("../../result/resnet32_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
-		else if(layer_num == 44) output.open("../../result/resnet44_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
-		else if(layer_num == 56) output.open("../../result/resnet56_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
-		else if(layer_num == 110) output.open("../../result/resnet110_cifar10_image" + to_string(image_id) +  "_" + timestamp +  ".txt");
+		if(layer_num == 20) output.open("../../result/" +timestamp+ "resnet20_cifar10_image" + to_string(image_id) + ".txt");
+		else if(layer_num == 32) output.open("../../result/" +timestamp+ "resnet32_cifar10_image" + to_string(image_id) + ".txt");
+		else if(layer_num == 44) output.open("../../result/" +timestamp+ "resnet44_cifar10_image" + to_string(image_id) + ".txt");
+		else if(layer_num == 56) output.open("../../result/" +timestamp+ "resnet56_cifar10_image" + to_string(image_id) + ".txt");
+		else if(layer_num == 110) output.open("../../result/" +timestamp+ "resnet110_cifar10_image" + to_string(image_id) + ".txt");
 		else throw std::invalid_argument("layer_num is not correct");
 		string dir = "mpcnn_models/resnet" + to_string(layer_num) + "_new";
 

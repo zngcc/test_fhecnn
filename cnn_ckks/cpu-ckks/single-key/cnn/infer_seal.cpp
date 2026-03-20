@@ -272,7 +272,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	map<string, ReLUConfig> relu_configs = {
 		{"deg13", {13, 3, {15, 15, 27}, 1.7, 16}},
+		{"deg12", {12, 3, {7, 15, 27},    1.7, 16}},
+		{"deg11", {11, 3, {7, 7, 27},    1.7, 16}},
+		{"deg10", {10, 3, {7, 7, 13},    1.7, 16}},
 		{"deg9",  {9,  2, {15, 15},     1.7, 11}},
+		{"deg8",  {8,  2, {7, 15},    1.7, 16}},
 		// more options
 		// 
 	};

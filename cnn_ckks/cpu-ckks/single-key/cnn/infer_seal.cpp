@@ -1,15 +1,20 @@
 #include "infer_seal.h"
 
-void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &linear_bias, vector<vector<double>> &conv_weight, vector<vector<double>> &bn_bias, vector<vector<double>> &bn_running_mean, vector<vector<double>> &bn_running_var, vector<vector<double>> &bn_weight, size_t layer_num, size_t end_num)
+void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &linear_bias, vector<vector<double>> &conv_weight, vector<vector<double>> &bn_bias, vector<vector<double>> &bn_running_mean, vector<vector<double>> &bn_running_var, vector<vector<double>> &bn_weight, size_t layer_num, size_t end_num, const string &model_path)
 {
 	string dir;
 	if(layer_num!=20 && layer_num!=32 && layer_num!=44 && layer_num!=56 && layer_num!=110) throw std::invalid_argument("layer number is not valid");
-	if(layer_num == 20) dir = "mpcnn_models/resnet20_new";
-	else if(layer_num == 32) dir = "mpcnn_models/resnet32_new";
-	else if(layer_num == 44) dir = "mpcnn_models/resnet44_new";
-	else if(layer_num == 56) dir = "mpcnn_models/resnet56_new";
-	else if(layer_num == 110) dir = "mpcnn_models/resnet110_new";
-
+	if(model_path == "../../pretrained_parameters/mpcnn_models/"){
+		if(layer_num == 20) dir = "mpcnn_models/resnet20_new";
+		else if(layer_num == 32) dir = "mpcnn_models/resnet32_new";
+		else if(layer_num == 44) dir = "mpcnn_models/resnet44_new";
+		else if(layer_num == 56) dir = "mpcnn_models/resnet56_new";
+		else if(layer_num == 110) dir = "mpcnn_models/resnet110_new";
+		dir = model_path + dir;
+	}
+	else{
+		dir = model_path;
+	}
 	ifstream in;
 	double val;
 	size_t num_c = 0, num_b = 0, num_m = 0, num_v = 0, num_w = 0;
@@ -30,7 +35,7 @@ void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &li
 
 	// convolution parameters
 	ci = 3, co = 16;
-	in.open("../../pretrained_parameters/" + dir + "/conv1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/conv1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<fh*fw*ci*co; i++) {in>>val; conv_weight[num_c].emplace_back(val);} in.close(); num_c++;
 
 	// convolution parameters
@@ -47,27 +52,27 @@ void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &li
 			if(j==1 || (j==2 && k==0)) ci=16;
 			else if((j==2 && k!=0) || (j==3 && k==0)) ci=32;
 			else ci=64;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_conv1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_conv1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<fh*fw*ci*co; i++) {in>>val; conv_weight[num_c].emplace_back(val);} in.close(); num_c++;
 
 			// ci setting
 			if(j==1) ci = 16;
 			else if(j==2) ci = 32;
 			else if(j==3) ci = 64;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_conv2_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_conv2_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<fh*fw*ci*co; i++) {in>>val; conv_weight[num_c].emplace_back(val);} in.close(); num_c++;
 		}
 	}	
 
 	// batch_normalization parameters
 	ci = 16;
-	in.open("../../pretrained_parameters/" + dir + "/bn1_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/bn1_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<ci; i++) {in>>val; bn_bias[num_b].emplace_back(val);} in.close(); num_b++;
-	in.open("../../pretrained_parameters/" + dir + "/bn1_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/bn1_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<ci; i++) {in>>val; bn_running_mean[num_m].emplace_back(val);} in.close(); num_m++;
-	in.open("../../pretrained_parameters/" + dir + "/bn1_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/bn1_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<ci; i++) {in>>val; bn_running_var[num_v].emplace_back(val);} in.close(); num_v++;
-	in.open("../../pretrained_parameters/" + dir + "/bn1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/bn1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<ci; i++) {in>>val; bn_weight[num_w].emplace_back(val);} in.close(); num_w++;
 
 	// batch_normalization parameters
@@ -80,32 +85,32 @@ void import_parameters_cifar10(vector<double> &linear_weight, vector<double> &li
 
 		for(int k=0; k<=end_num; k++)
 		{
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_bias[num_b].emplace_back(val);} in.close(); num_b++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_running_mean[num_m].emplace_back(val);} in.close(); num_m++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_running_var[num_v].emplace_back(val);} in.close(); num_v++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn1_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_weight[num_w].emplace_back(val);} in.close(); num_w++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_bias[num_b].emplace_back(val);} in.close(); num_b++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_running_mean.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_running_mean[num_m].emplace_back(val);} in.close(); num_m++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_running_var.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_running_var[num_v].emplace_back(val);} in.close(); num_v++;
-			in.open("../../pretrained_parameters/" + dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+			in.open(dir + "/layer" + to_string(j) + "_" + to_string(k) + "_bn2_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 			for(long i=0; i<ci; i++) {in>>val; bn_weight[num_w].emplace_back(val);} in.close(); num_w++;
 		}
 	}
 
 	// FC
-	in.open("../../pretrained_parameters/" + dir + "/linear_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/linear_weight.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<10*64; i++) {in>>val; linear_weight.emplace_back(val);} in.close();
-	in.open("../../pretrained_parameters/" + dir + "/linear_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
+	in.open(dir + "/linear_bias.txt"); if(!in.is_open()) throw std::runtime_error("file is not open");
 	for(long i=0; i<10; i++) {in>>val; linear_bias.emplace_back(val);} in.close();
 }
-void import_parameters_cifar100(vector<double> &linear_weight, vector<double> &linear_bias, vector<vector<double>> &conv_weight, vector<vector<double>> &bn_bias, vector<vector<double>> &bn_running_mean, vector<vector<double>> &bn_running_var, vector<vector<double>> &bn_weight, vector<vector<double>> &shortcut_weight, vector<vector<double>> &shortcut_bn_bias, vector<vector<double>> &shortcut_bn_mean, vector<vector<double>> &shortcut_bn_var, vector<vector<double>> &shortcut_bn_weight, size_t layer_num, size_t end_num)
+void import_parameters_cifar100(vector<double> &linear_weight, vector<double> &linear_bias, vector<vector<double>> &conv_weight, vector<vector<double>> &bn_bias, vector<vector<double>> &bn_running_mean, vector<vector<double>> &bn_running_var, vector<vector<double>> &bn_weight, vector<vector<double>> &shortcut_weight, vector<vector<double>> &shortcut_bn_bias, vector<vector<double>> &shortcut_bn_mean, vector<vector<double>> &shortcut_bn_var, vector<vector<double>> &shortcut_bn_weight, size_t layer_num, size_t end_num, const string &model_path)
 {
 	string dir;
 	if(layer_num!=32) throw std::invalid_argument("layer number is not valid");
@@ -248,10 +253,28 @@ void import_parameters_cifar100(vector<double> &linear_weight, vector<double> &l
 	for(long i=0; i<100; i++) {in>>val; linear_bias.emplace_back(val);} in.close();
 }
 
-void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t end_image_id)
+void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t end_image_id, string precison_config, string model_path)
 {
+	
+	auto now = chrono::system_clock::now();
+	time_t now_time = chrono::system_clock::to_time_t(now);
+	stringstream ss;
+	ss << put_time(localtime(&now_time), "%Y%m%d_%H%M%S");
+	string timestamp = ss.str();
 	// approximation boundary setting
+	struct ReLUConfig {
+		long alpha;
+		int comp_no;
+		vector<int> deg;
+		double scaled_val;
+	};
 
+	map<string, ReLUConfig> relu_configs = {
+		{"deg13", {13, 3, {15, 15, 27}, 1.7}},
+		{"deg9",  {9,  2, {15, 15},     1.7}},
+		// more options
+		// 
+	};
 	////////////////////////////////////////////////////////////////////////
 	double B = 40.0;	// approximation boundary
 
@@ -259,12 +282,23 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	////////////////////////////////////////////////////////////////////////
 
 	// approx ReLU setting
-	long alpha = 13;			// precision parameter alpha
-	long comp_no = 3;		// number of compositions
-	vector<int> deg = {15,15,27};		// degrees of component polynomials
-	// double eta = pow(2.0,-15);		// margin
-	double scaled_val = 1.7;		// scaled_val: the last scaled value
-	// double max_factor = 16;		// max_factor = 1 for comparison operation. max_factor > 1 for max or ReLU function
+	// long alpha = 13;			// precision parameter alpha
+	// long comp_no = 3;		// number of compositions
+	// vector<int> deg = {15,15,27};		// degrees of component polynomials
+	// // double eta = pow(2.0,-15);		// margin
+	// double scaled_val = 1.7;		// scaled_val: the last scaled value
+	// // double max_factor = 16;		// max_factor = 1 for comparison operation. max_factor > 1 for max or ReLU function
+	
+	auto it = relu_configs.find(precison_config);
+	if (it == relu_configs.end()) {
+		throw std::invalid_argument("Unknown ReLU configuration: " + precison_config);
+	}
+	long alpha = it->second.alpha;
+	int comp_no = it->second.comp_no;
+	vector<int> deg = it->second.deg;
+	double scaled_val = it->second.scaled_val;
+	
+	////////////////////
 	vector<Tree> tree;		// structure of polynomial evaluation
 	evaltype ev_type = evaltype::oddbaby;
 	// RR::SetOutputPrecision(25);
@@ -282,11 +316,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 
 	// all threads output files
 	ofstream out_share;
-	if(layer_num == 20) out_share.open("../../result/resnet20_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 32) out_share.open("../../result/resnet32_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 44) out_share.open("../../result/resnet44_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 56) out_share.open("../../result/resnet56_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
-	else if(layer_num == 110) out_share.open("../../result/resnet110_cifar10_label_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	if(layer_num == 20) out_share.open("../../result/resnet20_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 32) out_share.open("../../result/resnet32_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 44) out_share.open("../../result/resnet44_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 56) out_share.open("../../result/resnet56_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
+	else if(layer_num == 110) out_share.open("../../result/resnet110_cifar10_label_" + timestamp + "_" + to_string(start_image_id) + "_" + to_string(end_image_id));
 	else throw std::invalid_argument("layer_num is not correct");
 
 	// SEAL and bootstrapping setting
@@ -312,19 +346,16 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	int log_special_prime = 51;
     int log_integer_part = logq - logp - loge + 5;
 ////////////////////////////////////////////////////////////////////
-	int remaining_level = 16; // Calculation required
-	int boot_level = 14; // 
+	// int remaining_level = 16; // Calculation required
 
-	// int remaining_level = 0;
-	// for (int i = 0; i < comp_no; i++) {
-	// 	remaining_level += ceil(log2(deg[i]));
-	// }
-	// remaining_level += 1; // for ReLU function
+	int remaining_level = 0;
+	for (int i = 0; i < comp_no; i++) {
+		remaining_level += ceil(log2(deg[i]));
+	}
+	remaining_level += 1; // for ReLU function
 	
-	// int boot_level = 14; // bootstrap level (保持与原始配置相同)
-
-
 ////////////////////////////////////////////////////////////////////
+	int boot_level = 14; // bootstrap level (保持与原始配置相同)
 	int total_level = remaining_level + boot_level;
 
 	vector<int> coeff_bit_vec;
@@ -436,11 +467,11 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		// each thread output result file
 		ofstream output;
 		cout << "create output file" << endl;
-		if(layer_num == 20) output.open("../../result/resnet20_cifar10_image" + to_string(image_id) + ".txt");
-		else if(layer_num == 32) output.open("../../result/resnet32_cifar10_image" + to_string(image_id) + ".txt");
-		else if(layer_num == 44) output.open("../../result/resnet44_cifar10_image" + to_string(image_id) + ".txt");
-		else if(layer_num == 56) output.open("../../result/resnet56_cifar10_image" + to_string(image_id) + ".txt");
-		else if(layer_num == 110) output.open("../../result/resnet110_cifar10_image" + to_string(image_id) + ".txt");
+		if(layer_num == 20) output.open("../../result/resnet20_cifar10_image" + to_string(image_id) + "_" + timestamp +  ".txt");
+		else if(layer_num == 32) output.open("../../result/resnet32_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
+		else if(layer_num == 44) output.open("../../result/resnet44_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
+		else if(layer_num == 56) output.open("../../result/resnet56_cifar10_image" + to_string(image_id) + "_" + timestamp +   ".txt");
+		else if(layer_num == 110) output.open("../../result/resnet110_cifar10_image" + to_string(image_id) +  "_" + timestamp +  ".txt");
 		else throw std::invalid_argument("layer_num is not correct");
 		string dir = "mpcnn_models/resnet" + to_string(layer_num) + "_new";
 
@@ -462,7 +493,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		vector<double> image, linear_weight, linear_bias;
 		vector<vector<double>> conv_weight, bn_bias, bn_running_mean, bn_running_var, bn_weight;
 				cout << "import par" << endl;
-		import_parameters_cifar10(linear_weight, linear_bias, conv_weight, bn_bias, bn_running_mean, bn_running_var, bn_weight, layer_num, end_num);
+		import_parameters_cifar10(linear_weight, linear_bias, conv_weight, bn_bias, bn_running_mean, bn_running_var, bn_weight, layer_num, end_num, model_path);
 				cout << "import par over" << endl;
 		// pack images compactly
 		ifstream in;

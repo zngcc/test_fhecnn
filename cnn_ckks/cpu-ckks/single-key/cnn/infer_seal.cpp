@@ -303,7 +303,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	vector<int> deg = it->second.deg;
 	double scaled_val = it->second.scaled_val;
 
-	
+	timestamp = timestamp + "deg" + to_string(alpha);
 	////////////////////
 	vector<Tree> tree;		// structure of polynomial evaluation
 	evaltype ev_type = evaltype::oddbaby;

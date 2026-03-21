@@ -15,13 +15,13 @@ void printSysconfMemoryInfo() {
     long avail_page_count = sysconf(_SC_AVPHYS_PAGES);
 
     if (pagesize == -1 || page_count == -1 || avail_page_count == -1) {
-        std::cerr << "无法获取内存信息\n";
+        std::cerr << "Can not get memory info\n";
         return;
     }
 
-    std::cout << "页面大小: " << pagesize << " bytes\n";
-    std::cout << "总物理内存: " << (page_count * pagesize) / (1024 * 1024) << " MB\n";
-    std::cout << "可用物理内存: " << (avail_page_count * pagesize) / (1024 * 1024) << " MB\n";
+    std::cout << "Page Size: " << pagesize << " bytes\n";
+    std::cout << "Total Physical Memory: " << (page_count * pagesize) / (1024 * 1024) << " MB\n";
+    std::cout << "Available Physical Memory: " << (avail_page_count * pagesize) / (1024 * 1024) << " MB\n";
 }
 int main(int argc, char **argv) {
 	printSysconfMemoryInfo();
